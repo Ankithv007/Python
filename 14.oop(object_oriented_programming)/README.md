@@ -188,4 +188,3 @@ In OOP, you model real-world entities as objects and define their behavior and i
 
 ---
 
-If you'd like a specific explanation or examples for a concept, let me know!
