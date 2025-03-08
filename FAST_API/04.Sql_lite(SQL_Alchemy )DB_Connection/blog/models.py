@@ -5,5 +5,5 @@ class Blog(Base):
     __tablename__ = "blogs"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, index=True)
-    description = Column(String)
+    title = Column(String, index=True)
+    body = Column(String)

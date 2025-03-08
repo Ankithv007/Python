@@ -1,22 +1,34 @@
 from fastapi import FastAPI, Depends
-from sqlalchemy.orm import Session
 from . import Schemas, models, database
+from .database import engine, SessionLocal
+from sqlalchemy.orm import Session
 
 app = FastAPI()
 
-models.Base.metadata.create_all(bind=database.engine)
+models.Base.metadata.create_all(engine)
 
 def get_db():
-    db = database.SessionLocal()
+    db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
 
-@app.post("/blog/", response_model=Schemas.Blog)
-async def create_blog(blog: Schemas.BlogCreate, db: Session = Depends(get_db)):
-    db_blog = models.Blog(**blog.dict())
-    db.add(db_blog)
+@app.post("/blog")
+async def create(request: Schemas.Blog, db: Session = Depends(get_db)):
+    new_blog = models.Blog(title=request.title, body=request.body)
+    db.add(new_blog)
     db.commit()
-    db.refresh(db_blog)
-    return db_blog
+    db.refresh(new_blog)
+    return new_blog
+
+@app.get("/blog")
+def all( db: Session = Depends(get_db)):
+    blogs = db.query(models.Blog).all()
+    return blogs
+
+
+@app.get("/blog/{id}")
+def show (id, db: Session = Depends(get_db)):
+    blog=db.query(models.Blog).filter(models.Blog.id == id).all()
+    return blog
